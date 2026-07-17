@@ -1,0 +1,13 @@
+{
+    "dataset_name": "bouncing_ball",
+    "split_name": "val",
+    "n_trajectories": 100,
+    "gravity": -1.0,
+    "width": 128,
+    "height": 128,
+    "radius": 5,
+    "max_traj_length": 100,
+    "velocity_scale": 5.0,
+    "position_mode": "id",
+    "seed": 42
+}

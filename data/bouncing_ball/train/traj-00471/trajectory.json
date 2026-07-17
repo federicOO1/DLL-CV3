@@ -1,0 +1,14 @@
+{
+    "initial_state": {
+        "mode": "parabolic",
+        "x": 50.0,
+        "y": 64.0,
+        "vx": -4.935408851440112,
+        "vy": 7.43373567899887
+    },
+    "num_frames": 68,
+    "stopped_early": true,
+    "num_bounces_floor": 14,
+    "num_bounces_wall": 2,
+    "num_bounces_top": 0
+}

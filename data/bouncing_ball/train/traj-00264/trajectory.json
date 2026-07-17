@@ -1,0 +1,14 @@
+{
+    "initial_state": {
+        "mode": "drop+horizontal",
+        "x": 88.0,
+        "y": 42.0,
+        "vx": -9.306744518384116,
+        "vy": 0.0
+    },
+    "num_frames": 48,
+    "stopped_early": true,
+    "num_bounces_floor": 20,
+    "num_bounces_wall": 2,
+    "num_bounces_top": 0
+}
