@@ -336,14 +336,17 @@ class LatentFlowVideoPredictor(nn.Module):
 
         # 2. Recon Loss e Motion Loss: Addestriamo il Decoder dal Latente Pulito
         recon_clean = self.decode_latent(z_target)
-        recon_l1 = F.l1_loss(recon_clean, target_frame)
-        recon_mse = F.mse_loss(recon_clean, target_frame)
-        recon_loss = 0.5 * recon_l1 + 0.5 * recon_mse
+        
+        fg_weight = 15.0
+        weights = torch.ones_like(target_frame)
+        weights[target_frame > 0.5] = fg_weight
+        
+        recon_loss = (weights * (recon_clean - target_frame) ** 2).mean()
 
         last_context = context_frames[:, -1]
         pred_motion = recon_clean - last_context
         tgt_motion = target_frame - last_context
-        motion_loss = F.l1_loss(pred_motion, tgt_motion)
+        motion_loss = (weights * (pred_motion - tgt_motion) ** 2).mean()
 
         # 3. State Loss (PINN constraint)
         if target_state is not None:
