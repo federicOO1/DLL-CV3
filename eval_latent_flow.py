@@ -125,7 +125,8 @@ def estimate_ball_center_robust(
     )
 
     for thr in thresholds:
-        mask = frame > thr if invert else frame < thr
+        # CORREZIONE 1: Se invert=True (palla scura), cerchiamo i pixel minori della soglia
+        mask = frame < thr if invert else frame > thr
         mass = int(mask.sum().item())
         if mass >= min_mass:
             weights = mask.float()
@@ -137,7 +138,8 @@ def estimate_ball_center_robust(
         flat = frame.reshape(-1)
         k = max(3, int(topk_ratio * flat.numel()))
         k = min(k, flat.numel())
-        vals, idx = torch.topk(flat, k=k, largest=invert)
+        # CORREZIONE 2: Se invert=True (palla scura), prendiamo i valori PIÙ PICCOLI (largest=False)
+        vals, idx = torch.topk(flat, k=k, largest=not invert)
 
         if vals.numel() >= min_mass:
             yy = (idx // w).float()
@@ -496,7 +498,7 @@ def main(args):
 
     print("\n=== Evaluating mode: one_step ===")
     
-    # 1. Estrarre i Probe dal Train Set (senza generare immagini -> risparmio RAM enorme)
+    # 1. Estrarre i Probe dal Train Set
     probe_train_loader = build_frame_loader(
         sequence_dirs=probe_train_dirs, context=context, invert=invert, grayscale=grayscale,
         num_workers=args.num_workers, batch_size=args.frame_batch_size, shuffle=True, stride=args.eval_stride

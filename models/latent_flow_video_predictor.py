@@ -339,7 +339,8 @@ class LatentFlowVideoPredictor(nn.Module):
         
         fg_weight = 15.0
         weights = torch.ones_like(target_frame)
-        weights[target_frame > 0.5] = fg_weight
+        
+        weights[target_frame < 0.5] = fg_weight 
         
         recon_loss = (weights * (recon_clean - target_frame) ** 2).mean()
 
