@@ -125,8 +125,7 @@ def estimate_ball_center_robust(
     )
 
     for thr in thresholds:
-        # CORREZIONE 1: Se invert=True (palla scura), cerchiamo i pixel minori della soglia
-        mask = frame < thr if invert else frame > thr
+        mask = frame > thr
         mass = int(mask.sum().item())
         if mass >= min_mass:
             weights = mask.float()
@@ -138,8 +137,8 @@ def estimate_ball_center_robust(
         flat = frame.reshape(-1)
         k = max(3, int(topk_ratio * flat.numel()))
         k = min(k, flat.numel())
-        # CORREZIONE 2: Se invert=True (palla scura), prendiamo i valori PIÙ PICCOLI (largest=False)
-        vals, idx = torch.topk(flat, k=k, largest=not invert)
+        
+        vals, idx = torch.topk(flat, k=k, largest=True)
 
         if vals.numel() >= min_mass:
             yy = (idx // w).float()
