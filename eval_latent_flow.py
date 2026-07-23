@@ -49,6 +49,9 @@ def load_model(model_dir, ckpt_name, device):
         state_loss_weight=args_dict.get("state_loss_weight", 0.1),
         recon_loss_weight=args_dict.get("recon_loss_weight", 0.2),
         motion_loss_weight=args_dict.get("motion_loss_weight", 0.1),
+        invert=args_dict.get("invert", False),
+        generated_frame_loss_weight=args_dict.get("generated_frame_loss_weight", 0.0),
+        generation_loss_steps=args_dict.get("generation_loss_steps", 5),
     ).to(device)
 
     model.load_state_dict(ckpt["model_state_dict"])
@@ -125,7 +128,8 @@ def estimate_ball_center_robust(
     )
 
     for thr in thresholds:
-        mask = frame > thr
+        # If invert=True, the ball is bright on a dark background.
+        mask = frame > thr if invert else frame < thr
         mass = int(mask.sum().item())
         if mass >= min_mass:
             weights = mask.float()
@@ -137,8 +141,8 @@ def estimate_ball_center_robust(
         flat = frame.reshape(-1)
         k = max(3, int(topk_ratio * flat.numel()))
         k = min(k, flat.numel())
-        
-        vals, idx = torch.topk(flat, k=k, largest=True)
+        # If invert=True, take the brightest pixels; otherwise take the darkest pixels.
+        vals, idx = torch.topk(flat, k=k, largest=invert)
 
         if vals.numel() >= min_mass:
             yy = (idx // w).float()
